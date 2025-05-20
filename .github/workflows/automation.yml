@@ -46,7 +46,8 @@ jobs:
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: kanchon136/automation-cicd  # Replace with your Docker Hub username if needed
+          # this is the docker hub repository with root location username and repository name
+          image: kanchon/automation-cicd
           tags: latest
           registry: docker.io
           dockerfile: Dockerfile
