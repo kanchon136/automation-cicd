@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: automation-cicd-deployment
+  namespace: automation
+  labels:
+    app: automation-cicd
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: automation-cicd
+  template:
+    metadata:
+      labels:
+        app: automation-cicd
+    spec:
+      containers:
+        - name: automation-cicd-container
+          image: kanchon/automation-cicd:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 7777
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"

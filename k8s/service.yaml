@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: automation-cicd-service
+  namespace: automation
+spec:
+  selector:
+    app: automation-cicd
+  type: NodePort
+  ports:
+    - port: 8099         # Port exposed inside the cluster
+      targetPort: 7777   # Port exposed by your container
+      nodePort: 30080    # External port on the node/minikube
