@@ -62,8 +62,8 @@ jobs:
 
       - name: Set Kubeconfig
         run: |
-          echo "${{ secrets.KUBEERNET_CONFIG }}" > kubeconfig
-          export KUBECONFIG=$PWD/kubeconfig
+          echo "${{ secrets.KUBEERNET_CONFIG }}" > $HOME/.kube/config
+        #  export KUBECONFIG=$PWD/kubeconfig
 
       - name: Deploy to Kubernetes
         run: |
