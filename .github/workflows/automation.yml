@@ -65,6 +65,10 @@ jobs:
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > $HOME/.kube/config
 
+      - name: Show kubeconfig lines
+        run: |
+          cat $HOME/.kube/config | wc -l
+
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f k8s/namespace.yaml
