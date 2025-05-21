@@ -64,10 +64,11 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
 
-      - name: Show kubeconfig lines
+      - name: Test Kubernetes Connection
         run: |
-          cat $HOME/.kube/config | wc -l
+          kubectl cluster-info
 
       - name: Deploy to Kubernetes
         run: |
