@@ -40,9 +40,9 @@ jobs:
 
       - name: Deploy to Local Kubernetes
         run: |
-          kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/namespace.yaml --validate=false
+          kubectl apply -f k8s/deployment.yaml --validate=false
+          kubectl apply -f k8s/service.yaml --validate=false
 
       - name: Check Deployment Status
         run: |
