@@ -8,6 +8,6 @@ spec:
     app: automation-cicd
   type: NodePort
   ports:
-    - port: 8099         # Port exposed inside the cluster
-      targetPort: 7777   # Port exposed by your container
-      nodePort: 30080    # External port on the node/minikube
+    - port: 8099         # ক্লাস্টারের ভেতরে এক্সেস করার পোর্ট
+      targetPort: 7777   # আপনার স্প্রিং বুট অ্যাপের পোর্ট
+      nodePort: 30080    # ব্রাউজার থেকে এক্সেস করার পোর্ট (localhost:30080)

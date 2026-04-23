@@ -14,16 +14,12 @@ name: Java CI with Maven (Local Self-Hosted)
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
-permissions:
-  contents: read
-  security-events: write
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-and-deploy:
-    # এখানে 'ubuntu-latest' পরিবর্তন করে 'self-hosted' দিতে হবে
     runs-on: self-hosted
 
     steps:
@@ -35,17 +31,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
 
       - name: Build with Maven
-        run: mvn -B package --file pom.xml -DskipTests
+        run: mvn clean package -DskipTests
 
-      # লোকাল ডকার ইমেজ বিল্ড (সরাসরি আপনার ল্যাপটপের ডকারে সেভ হবে)
       - name: Build Docker image
-        run: |
-          docker build -t kanchon/automation-cicd:latest .
+        run: docker build -t kanchon/automation-cicd:latest .
 
-      # আপনার ল্যাপটপে কুবারনেটিস অলরেডি কানেক্টেড, তাই সরাসরি অ্যাপ্লাই করলেই হবে
       - name: Deploy to Local Kubernetes
         run: |
           kubectl apply -f k8s/namespace.yaml
@@ -53,17 +45,9 @@ jobs:
           kubectl apply -f k8s/service.yaml
 
       - name: Check Deployment Status
-        run: kubectl get pods -n <your-namespace-name>
-
-
-
-
-
-
-
-
-
-
+        run: |
+          kubectl get pods -n automation
+          kubectl get svc -n automation
 
 
 #name: Java CI with Maven
