@@ -33,7 +33,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+        run: mvn clean package -DskipTests -e -X
 
       - name: Build Docker image
         run: docker build -t kanchon/automation-cicd:latest .
