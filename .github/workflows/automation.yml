@@ -33,7 +33,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests -e -X
+        run: mvn clean package -DskipTests
 
       - name: Build Docker image
         run: docker build -t kanchon/automation-cicd:latest .
@@ -43,13 +43,21 @@ jobs:
           kubectl apply -f k8s/namespace.yaml --validate=false
           kubectl apply -f k8s/deployment.yaml --validate=false
           kubectl apply -f k8s/service.yaml --validate=false
+          
+          # --- এখান থেকে অটোমেশনের আসল কাজ শুরু ---
+          
+          # ১. কুবারনেটিসকে বাধ্য করা যাতে সে নতুন ইমেজ দিয়ে পড রিস্টার্ট দেয়
+          kubectl rollout restart deployment/automation-cicd-deployment -n automation
+          
+          # ২. আপডেট সফল হওয়া পর্যন্ত অপেক্ষা করা
+          kubectl rollout status deployment/automation-cicd-deployment -n automation
 
-      - name: Check Deployment Status
+      - name: Verify Final Status
         run: |
           kubectl get pods -n automation
           kubectl get svc -n automation
-
-
+          # এন্ডপয়েন্ট চেক করা যাতে কনফার্ম হওয়া যায় পডগুলো কানেক্টেড
+          kubectl get ep automation-cicd-service -n automation
 #name: Java CI with Maven
 #
 #on:

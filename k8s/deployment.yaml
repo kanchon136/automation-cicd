@@ -7,6 +7,11 @@ metadata:
     app: automation-cicd
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: automation-cicd
@@ -18,9 +23,15 @@ spec:
       containers:
         - name: automation-cicd-container
           image: kanchon/automation-cicd:latest
-          imagePullPolicy: IfNotPresent  # <--- এখানে পরিবর্তন করা হয়েছে
+          imagePullPolicy: Always  # <--- এটি নিশ্চিত করবে প্রতিবার নতুন কোড চেক করবে
           ports:
             - containerPort: 7777
+          readinessProbe: # এই অংশটি অটোমেশনের জন্য দরকার
+            httpGet:
+              path: /test # কুবারনেটিস এই পাথে নক করে দেখবে অ্যাপ রেডি কি না
+              port: 7777
+            initialDelaySeconds: 15
+            periodSeconds: 5
           resources:
             limits:
               memory: "512Mi"
@@ -31,7 +42,6 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
-
 
 
 
