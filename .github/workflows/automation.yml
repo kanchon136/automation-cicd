@@ -9,13 +9,14 @@
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
 
-name: Java CI with Maven (Local Self-Hosted)
+name: Java CI/CD with Maven (Local Self-Hosted)
 
 on:
   push:
     branches: [ "main" ]
 
 env:
+  # Node.js version conflict এড়াতে এটি ব্যবহার করা হয়
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
@@ -31,33 +32,44 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: maven # এটি বারবার ডিপেন্ডেন্সি ডাউনলোড হওয়া কমাবে
 
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      - name: Build Docker image
-        run: docker build -t kanchon/automation-cicd:latest .
+      # ১. ডকার হাবে পুশ করার আগে লগইন করা বাধ্যতামূলক
+      - name: Login to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
+      # ২. ইমেজ বিল্ড এবং পুশ (আপনি আগে শুধু বিল্ড করেছিলেন, এখন পুশও হবে)
+      - name: Build and Push Docker image
+        run: |
+          docker build -t kanchon/automation-cicd:latest .
+          docker push kanchon/automation-cicd:latest
+
+      # ৩. লোকাল কুবারনেটিসে ডিপ্লয়মেন্ট
       - name: Deploy to Local Kubernetes
         run: |
-          kubectl apply -f k8s/namespace.yaml --validate=false
-          kubectl apply -f k8s/deployment.yaml --validate=false
-          kubectl apply -f k8s/service.yaml --validate=false
+          # কন্টেইনার ইমেজ আপডেট করার জন্য ফাইলগুলো অ্যাপ্লাই করা
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
           
-          # --- এখান থেকে অটোমেশনের আসল কাজ শুরু ---
-          
-          # ১. কুবারনেটিসকে বাধ্য করা যাতে সে নতুন ইমেজ দিয়ে পড রিস্টার্ট দেয়
+          # কুবারনেটিসকে ফোর্স করা যাতে সে ডকার হাব থেকে নতুন ইমেজ নামিয়ে পড রিস্টার্ট দেয়
           kubectl rollout restart deployment/automation-cicd-deployment -n automation
           
-          # ২. আপডেট সফল হওয়া পর্যন্ত অপেক্ষা করা
+          # রোলআউট সফল হওয়া পর্যন্ত অপেক্ষা করা
           kubectl rollout status deployment/automation-cicd-deployment -n automation
 
       - name: Verify Final Status
         run: |
           kubectl get pods -n automation
           kubectl get svc -n automation
-          # এন্ডপয়েন্ট চেক করা যাতে কনফার্ম হওয়া যায় পডগুলো কানেক্টেড
+          # এন্ডপয়েন্ট চেক করা
           kubectl get ep automation-cicd-service -n automation
+          
+
 #name: Java CI with Maven
 #
 #on:

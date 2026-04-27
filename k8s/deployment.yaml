@@ -20,18 +20,32 @@ spec:
       labels:
         app: automation-cicd
     spec:
+      # ১. গ্রেসফুল শাটডাউন (পড বন্ধ হওয়ার আগে কাজ শেষ করার সময় দিবে)
+      terminationGracePeriodSeconds: 30
       containers:
         - name: automation-cicd-container
           image: kanchon/automation-cicd:latest
-          imagePullPolicy: Always  # <--- এটি নিশ্চিত করবে প্রতিবার নতুন কোড চেক করবে
+          imagePullPolicy: Always
           ports:
             - containerPort: 7777
-          readinessProbe: # এই অংশটি অটোমেশনের জন্য দরকার
+
+          # ২. Readiness Probe (আপনারটা ঠিক আছে, শুধু সময়টা এডজাস্ট করা হয়েছে)
+          readinessProbe:
             httpGet:
-              path: /test # কুবারনেটিস এই পাথে নক করে দেখবে অ্যাপ রেডি কি না
+              path: /test
               port: 7777
-            initialDelaySeconds: 15
-            periodSeconds: 5
+            initialDelaySeconds: 20 # অ্যাপ্লিকেশন স্টার্ট হতে সময় দিলে এরর কম হয়
+            periodSeconds: 10
+            failureThreshold: 3
+
+          # ৩. Liveness Probe (পড হ্যাং হয়ে গেলে অটো রিস্টার্ট করবে)
+          livenessProbe:
+            httpGet:
+              path: /test
+              port: 7777
+            initialDelaySeconds: 40
+            periodSeconds: 20
+
           resources:
             limits:
               memory: "512Mi"

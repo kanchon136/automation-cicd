@@ -8,6 +8,8 @@ spec:
     app: automation-cicd
   type: NodePort
   ports:
-    - port: 8099         # ক্লাস্টারের ভেতরে এক্সেস করার পোর্ট
-      targetPort: 7777   # আপনার স্প্রিং বুট অ্যাপের পোর্ট
-      nodePort: 30030    # ব্রাউজার থেকে এক্সেস করার পোর্ট (localhost:30080)
+    - name: http
+      protocol: TCP
+      port: 8099
+      targetPort: 7777
+      nodePort: 30030 # ব্রাউজার থেকে এক্সেস করার পোর্ট (localhost:30080)
