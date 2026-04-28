@@ -6,10 +6,9 @@ metadata:
 spec:
   selector:
     app: automation-cicd
-  type: NodePort
+  type: LoadBalancer # স্থায়ী সমাধানের জন্য টাইপ পরিবর্তন করা হয়েছে
   ports:
     - name: http
       protocol: TCP
-      port: 8099
-      targetPort: 7777
-      nodePort: 30030 # ব্রাউজার থেকে এক্সেস করার পোর্ট (localhost:30080)
+      port: 8099         # এখন সরাসরি এই পোর্টে হিট দিবেন (http://localhost:8099)
+      targetPort: 7777   # আপনার অ্যাপের ভেতরের পোর্টর্ট (localhost:30080)
