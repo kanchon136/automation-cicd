@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TesController {
 
 
-    @GetMapping("/")
+    @GetMapping
     public String getTest(){
         return  " Automation successfully..!!";
     }
